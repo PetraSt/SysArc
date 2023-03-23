@@ -1,13 +1,15 @@
-from flask import Flask
+import requests
+import json
 
-app = Flask(__name__)
+sensor_id = 'sensor_1'
 
-@app.route('/temperature')
-def temperature():
-    # Code to measure temperature and return the result
-    return '25.6'  # Example temperature measurement
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
-
-#Time passed from first message to last in: 1.75
+for i in range(1000):
+    value = 20 + i/10
+    data = {
+        'sensor_id': sensor_id,
+        'value': value
+    }
+    headers = {
+        'Content-type': 'application/json'
+    }
+    response = requests.post('http://localhost:3000/data', data=json.dumps(data), headers=headers)

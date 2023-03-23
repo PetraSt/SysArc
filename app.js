@@ -1,40 +1,27 @@
-const express = require('express');
-const request = require('request');
-const app = express();
+const express = require('express')
+const bodyParser = require('body-parser')
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-});
+const app = express()
 
-app.get('/temperature', (req, res) => {
-  // Make a GET request to the Python script running on the IoT device
-  const start_time = new Date().getTime()
-  let count = 0
-  for (let i = 0; i < 1000; i++) {
-    request('http://0.0.0.0:5000/temperature', (error, response, body) => {
-      if (error) {
-        console.error(error);
-        res.status(500).send('Error retrieving temperature measurement');
-        return;
-      } else {
-        count++
-        //let temperature = parseFloat(body);
-        //res.send(`Current temperature measurement: ${temperature}`);
-        if (count == 1000){
-          const end_time = new Date().getTime()
-          const elapsed_time = ((end_time - start_time) / 1000)
-          const delivery_rate = count / elapsed_time
-          console.log(`Message delivery rate: ${delivery_rate} messages/second`)
-          console.log("Time passed from first message to last in: " + `${elapsed_time}`)
-          console.log(`Received messages count: ${count}`)
-          res.send("Time passed from first message to last in: " + `${elapsed_time}`);
-          return;
-        }
-      }
-    });
+app.use(bodyParser.json())
+
+let startTime
+let count = 0
+
+app.post('/data', (req, res) => {
+  console.log(req.body)
+  // do something with the data, e.g. store it in a database
+  count++
+  if (count === 1) {
+    startTime = Date.now()
+  } else if (count === 1000) {
+    const endTime = Date.now()
+    const totalTime = (endTime - startTime) / 1000
+    console.log(`Received 1000 messages in ${totalTime} s`)
   }
-});
+  res.status(200).send('Data received')
+})
 
 app.listen(3000, () => {
-  console.log('Server listening on port 3000');
-});
+  console.log('Server started on port 3000')
+})
