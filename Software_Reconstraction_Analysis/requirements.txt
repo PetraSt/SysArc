@@ -1,0 +1,4 @@
+gitpython
+pyvis
+matplotlib
+scipy
